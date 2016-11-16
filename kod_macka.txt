@@ -1,0 +1,81 @@
+?using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FEAR
+{
+    class DatabaseConnection
+    {
+        public SqlDataAdapter DataAdapter;
+        public SqlTransaction Transaction;
+        public SqlConnection SqlConnection;
+        public String ConnectionString { get; set; }
+
+        public bool OpenConnection(String query, params String[] parm)
+        {
+            try
+            {
+            SqlConnection = new SqlConnection(ConnectionString);
+            SqlConnection.Open();
+            Transaction = SqlConnection.BeginTransaction();
+            return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;           
+            }
+        }
+        public bool CloseConnection()
+        {
+            try
+            {
+			SqlConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;           
+            }
+        }
+        public bool ExecuteCommand(String query)
+        {
+            try
+            {
+                SqlCommand sqlCommand = new SqlCommand(query, SqlConnection, Transaction);
+            sqlCommand.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+        public DataTable ExecuteQuery(String query)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, SqlConnection, Transaction);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            return dataTable;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
+	
+
+
+
+    }
+
+}
